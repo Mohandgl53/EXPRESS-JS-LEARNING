@@ -1,5 +1,5 @@
 export const createUserValidationSchema = {
-    username:{
+    user_name:{
         notEmpty:{
             errorMessage: "User Name must not be Empty"
         },
@@ -11,9 +11,9 @@ export const createUserValidationSchema = {
             errorMessage: "User Name must be a String"
         }
     },
-    age:{
+    password:{
         notEmpty:{
-            errorMessage: "Age must not be Empty"
+            errorMessage: "Password must not be Empty"
         }
     }
 }

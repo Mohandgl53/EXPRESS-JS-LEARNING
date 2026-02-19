@@ -3,6 +3,7 @@ import { createUserValidationSchema } from '../utils/validationSchema.mjs';
 import { checkSchema, validationResult, matchedData } from 'express-validator';
 import { getIndexById, getParamsId } from "../utils/middlewares.mjs";
 import { users } from '../utils/constants.mjs'
+import { User } from "../mongoose/schema/user.mjs";
 
 const router = Router();
 
@@ -15,8 +16,8 @@ router.get('/api/users', (req, res) => {
         }
         return res.send(users)
     }
-    else{
-        res.send({msg: "You are not an Admin"})
+    else {
+        res.send({ msg: "You are not an Admin" })
     }
 })
 
@@ -31,16 +32,22 @@ router.get('/api/users/:id', getParamsId, (req, res) => {
 
 router.post("/api/users",
     checkSchema(createUserValidationSchema),
-    (req, res) => {
+    async (req, res) => {
         const result = validationResult(req);
         console.log(result)
         if (!result.isEmpty()) {
             return res.status(400).send({ error: result.array() })
         }
         const body = matchedData(req);
-        const newUser = { id: users[users.length - 1].id + 1, ...body }
-        users.push(newUser);
-        res.status(201).send(newUser);
+        const newUser = new User(body);
+        try {
+            const savedUser = await newUser.save();
+            return res.status(201).send(savedUser);
+        }
+        catch(err){
+            console.log(err)
+            return res.status(400).send({msg: "User not Saved"})
+        }
     })
 
 router.put("/api/users/:id", getIndexById, (req, res) => {
